@@ -21,7 +21,7 @@ func CreateChunkFromBytes(chunkBytes []byte) Chunk {
 	fourBytes := make([]byte, 4)
 
 	reader.Read(fourBytes)
-	length := binary.LittleEndian.Uint32(fourBytes)
+	length := binary.BigEndian.Uint32(fourBytes)
 
 	reader.Read(fourBytes)
 	chunkTypeBytes := [4]byte{}
@@ -32,9 +32,9 @@ func CreateChunkFromBytes(chunkBytes []byte) Chunk {
 	reader.Read(data)
 
 	reader.Read(fourBytes)
-	crc := binary.LittleEndian.Uint32(fourBytes)
+	crc := binary.BigEndian.Uint32(fourBytes)
 
-	checksumBytes := make([]byte, len(data)+int(length))
+	var checksumBytes []byte
 	checksumBytes = append(checksumBytes, chunkTypeBytes[:]...)
 	checksumBytes = append(checksumBytes, data...)
 	expectedCrc := crc32.ChecksumIEEE(checksumBytes)

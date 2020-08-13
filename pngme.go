@@ -13,7 +13,7 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		fmt.Println("%v", err)
+		fmt.Printf("%v\n", err)
 	}
 }
 
@@ -73,13 +73,13 @@ func removeMessage(context *cli.Context) error {
 
 func printChunks(context *cli.Context) error {
 	filePath := context.Args().Get(0)
-	fmt.Println(filePath)
 
 	bytes := getFileBytes(filePath)
 	png := CreatePngFromBytes(bytes)
 
-	for chunk := range png.chunks {
+	for _, chunk := range png.chunks {
 		fmt.Println(chunk)
+		fmt.Println("-------")
 	}
 
 	return nil
