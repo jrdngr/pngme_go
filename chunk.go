@@ -9,10 +9,10 @@ import (
 
 // Chunk for a PNG file
 type Chunk struct {
-	length uint32
+	length    uint32
 	chunkType ChunkType
-	data []byte
-	crc uint32
+	data      []byte
+	crc       uint32
 }
 
 // CreateChunkFromBytes does what it says it does
@@ -27,23 +27,26 @@ func CreateChunkFromBytes(chunkBytes []byte) Chunk {
 	chunkTypeBytes := [4]byte{}
 	copy(chunkTypeBytes[:], fourBytes[:])
 	chunkType := CreateChunkTypeFromBytes(chunkTypeBytes)
-	
+
 	data := make([]byte, length)
 	reader.Read(data)
 
 	reader.Read(fourBytes)
 	crc := binary.LittleEndian.Uint32(fourBytes)
 
-	checksumBytes := make([]byte, len(data) + int(length))
+	checksumBytes := make([]byte, len(data)+int(length))
 	checksumBytes = append(checksumBytes, chunkTypeBytes[:]...)
 	checksumBytes = append(checksumBytes, data...)
-	expectedCrc := crc32.ChecksumIEEE(checksumBytes);
+	expectedCrc := crc32.ChecksumIEEE(checksumBytes)
 
 	if crc != expectedCrc {
-		panic("Calculated crc did not match data crc")
+		fmt.Println("Calculated crc did not match data crc")
+		fmt.Printf("Calculated crc: %v\n", expectedCrc)
+		fmt.Printf("Data crc: %v\n", crc)
+		panic("Invalid input data")
 	}
 
-	return Chunk {
+	return Chunk{
 		length,
 		chunkType,
 		data,
@@ -52,5 +55,10 @@ func CreateChunkFromBytes(chunkBytes []byte) Chunk {
 }
 
 func (chunk Chunk) String() string {
-	return fmt.Sprintf("%v", chunk.chunkType)
+	length := fmt.Sprintf("Length: %v", chunk.length)
+	chunkType := fmt.Sprintf("Chunk Type: %v", chunk.chunkType)
+	data := fmt.Sprintf("Data: %v bytes", len(chunk.data))
+	crc := fmt.Sprintf("Crc: %v", chunk.crc)
+
+	return fmt.Sprintf("%v\n%v\n%v\n%v", length, chunkType, data, crc)
 }
